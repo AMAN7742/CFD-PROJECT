@@ -2,32 +2,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-# -----------------------------
-# Parameters
-# -----------------------------
 C = 1.0
 A = 1.0
 B = 0.1
 k = 1 / np.sqrt(2)
 L = 2 * np.pi / k
-N = 300           # Grid points (start with 300 for stability, increase later)
+N = 300           # Grid points 
 dx = L / N
-dt = 1e-6         # Smaller time step for stability
+dt = 1e-6         
 T = 2.0
 steps = int(T / dt)
 x = np.linspace(0, L, N)
 
-# -----------------------------
-# Initial Condition
-# -----------------------------
 h = 1 + B * np.cos(k * x)
 h_new = h.copy()
 
-# -----------------------------
-# Prepare Animation
-# -----------------------------
 frames = []
-frame_interval = int(0.01 / dt)  # save every 0.01s
+frame_interval = int(0.01 / dt)  
 
 def compute_derivatives(h):
     h_x = np.zeros_like(h)
@@ -50,9 +41,6 @@ def compute_derivatives(h):
 
     return h_x, h_xx, h_xxx
 
-# -----------------------------
-# Time Loop
-# -----------------------------
 for step in range(steps):
     # Clip to avoid overflow
     h_safe = np.clip(h, 1e-6, 10)
@@ -71,11 +59,10 @@ for step in range(steps):
     flux2_x[0] = flux2_x[1]
     flux2_x[-1] = flux2_x[-2]
 
-    # Time evolution (Euler)
+    
     dhdt = -1/(3*C) * flux1_x - A * flux2_x
     h_new = h + dt * dhdt
 
-    # Enforce boundary condition: flat at both ends
     h_new[0] = h_new[1]
     h_new[-1] = h_new[-2]
 
@@ -84,13 +71,11 @@ for step in range(steps):
 
     h = h_new.copy()
 
-    # Save for animation
+    
     if step % frame_interval == 0:
         frames.append(h.copy())
 
-# -----------------------------
-# Animation
-# -----------------------------
+
 fig, ax = plt.subplots()
 line, = ax.plot(x, frames[0])
 ax.set_ylim(0, 1)   # ✅ Y-axis limit fixed here
@@ -107,3 +92,4 @@ ani = animation.FuncAnimation(fig, animate, frames=len(frames), interval=50)
 ani.save("thin_film_evolution.mp4", writer='ffmpeg', dpi=200)
 
 print("✅ Animation saved as thin_film_evolution.mp4")
+
